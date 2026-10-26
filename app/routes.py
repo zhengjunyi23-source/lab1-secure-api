@@ -35,7 +35,7 @@ def login():
         token = create_token(user.id)
         return jsonify(
             token=token,
-            token_type="Bearer",
+            token_type="Bearer",  # nosec B106 - "Bearer" is the JWT scheme identifier, not a password
             expires_in_minutes=current_app.config["JWT_EXPIRES_MINUTES"],
         ), 200
 

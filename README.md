@@ -118,18 +118,76 @@ Runs automatically on every push to `main` and on every pull request:
 
 ### 4.1 Reproduction (Vulhub)
 
-*(added below after execution)*
+Environment used: `vulhub/tomcat/CVE-2020-1938` (Apache Tomcat 9.0.30).
+
+```bash
+cd vulhub/tomcat/CVE-2020-1938
+docker compose up -d        # starts Tomcat; HTTP 8080 + AJP 8009 exposed
+# verify AJP is reachable
+Test-NetConnection 127.0.0.1 -Port 8009   # -> True
+
+# Run the Ghostcat PoC (crafted AJP forward request) to read WEB-INF/web.xml
+python poc.py 127.0.0.1 -p 8009 -f WEB-INF/web.xml
+```
+
+Result — the unauthenticated AJP request returns the contents of
+`WEB-INF/web.xml` (arbitrary file read):
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee" ...>
+  <display-name>Welcome to Tomcat</display-name>
+  ...
+</web-app>
+```
+
+> The PoC (`poc.py`) connects directly to the AJP port 8009 and sends a
+> `AjpForwardRequest` carrying the attributes `javax.servlet.include.path_info
+> = <file>` / `servlet_path = /`. Tomcat's `JspServlet` honors these include
+> attributes and reads the requested file without any authentication.
 
 ### 4.2 Root-cause analysis
 
-The AJP connector on port 8009 was left **exposed by default** and the connector did not
-perform **any authentication** of AJP requests; it trusted whatever path, servlet and request
-attributes an AJP client supplied, so a remote client could request the `JspServlet`
-(`*.jsp`) and pass attributes that made it read files outside the normal servlet mapping.
+The root cause is a **configuration/logic weakness in the AJP connector**:
+
+- The AJP/1.3 Connector is **enabled by default** on port 8009:
+  ```xml
+  <Connector port="8009" protocol="AJP/1.3" redirectPort="8443" />
+  ```
+- It is **not bound to localhost** (`address` not set → listens on all interfaces)
+  and has **no `secret`/`requiredSecret`** — i.e. no authentication at all.
+- Tomcat **fully trusts** the path, servlet and request attributes supplied by an
+  AJP client, so a remote client can point the `JspServlet` at any file inside
+  the webapp (`WEB-INF/web.xml`, JSP sources, config) and read it. Combined with a
+  file-upload endpoint this even becomes remote code execution (file inclusion).
+
+It is therefore an **improper-input-handling / insecure-default-configuration**
+vulnerability: the AJP protocol itself is trusted without authentication, and the
+connector is exposed by default.
 
 ### 4.3 Applied fix
 
-*(added below after execution)*
+Because this deployment has no Apache front-end (mod_jk / mod_proxy_ajp), the AJP
+connector is not needed, so the fix **disables the AJP connector entirely** in
+`conf/server.xml`, and stops exposing port 8009 in `docker-compose.yml`.
+
+Fix files are in the `cve-2020-1938-fix/` folder: `server.xml`, `Dockerfile`,
+`docker-compose.yml`, plus `FIX-README.md`.
+
+```bash
+cd vulhub/tomcat/CVE-2020-1938
+docker compose down          # stop the vulnerable environment
+docker compose up --build -d # rebuild with the hardened server.xml (AJP disabled)
+```
+
+Verification:
+
+- AJP port 8009 is no longer reachable: `Test-NetConnection 127.0.0.1 -Port 8009` → **False**.
+- Re-running the PoC now **fails**:
+  ```
+  ConnectionRefusedError: [WinError 10061]  # target actively refused connection
+  ```
+- Regression — the web application still works: `GET http://127.0.0.1:8080/` → **HTTP 200** (Apache Tomcat welcome page).
 
 ---
 
