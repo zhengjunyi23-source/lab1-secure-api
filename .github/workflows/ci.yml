@@ -23,7 +23,7 @@ jobs:
 
       # ---- Functional tests ---------------------------------------------
       - name: Run tests (pytest)
-        run: pytest -q
+        run: python -m pytest -q
 
       # ---- SAST: static analysis with Bandit ----------------------------
       - name: SAST - Bandit
