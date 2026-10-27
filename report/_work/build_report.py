@@ -108,6 +108,21 @@ def add_table(doc, header, rows):
     return t
 
 
+def add_image(doc, path, width_cm, caption=None):
+    p = doc.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.paragraph_format.space_before = Pt(6)
+    run = p.add_run()
+    run.add_picture(path, width=Cm(width_cm))
+    if caption:
+        cp = doc.add_paragraph()
+        cp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        cp.paragraph_format.space_before = Pt(2)
+        cp.paragraph_format.space_after = Pt(6)
+        set_run(cp.add_run(), caption, EA, LAT, 9, True)
+    return
+
+
 # ---------------- build document ----------------
 doc = Document()
 
@@ -175,7 +190,7 @@ para(doc, "A Python + Flask stack was chosen. The project is managed with pip in
           "linked to a public GitHub repository for the CI/CD part.")
 bullet(doc, "Language: Python 3.13 + Flask 3.1.3; ORM: Flask-SQLAlchemy 3.1.1; JWT: PyJWT 2.15.1; password hashing: bcrypt 5.0.0.")
 bullet(doc, "Package manager: pip (python -m pip). Dependencies are pinned in requirements.txt.")
-bullet(doc, "Version control: git repository initialised locally and linked to GitHub (repository URL: 【待补：GitHub 仓库链接】).")
+bullet(doc, "Version control: git repository initialised locally and linked to GitHub (repository URL: https://github.com/zhengjunyi23-source/lab1-secure-api).")
 
 # ================= 3. Functional API =================
 heading(doc, "3. Developing a Functional API", 1)
@@ -223,7 +238,14 @@ para(doc, "A GitHub Actions workflow .github/workflows/ci.yml runs on every push
 para(doc, "Local verification of the exact pipeline commands:")
 code_block(doc, "$ bandit -r app\nNo issues identified.\nTotal issues (by severity): Low 0, Medium 0, High 0\n"
                "$ safety check -r requirements.txt\n0 vulnerabilities reported\nNo known security vulnerabilities reported.")
-para(doc, "GitHub Actions run result and scanner-report screenshots: 【待补：最后一次 pipeline run 链接及 SAST/SCA 报告截图】.")
+para(doc, "GitHub Actions run result: the last successful run (#2, commit 8f9a331) on main passed every "
+          "step, including the SAST (Bandit) and SCA (Safety) scans, and uploaded the scanner reports as "
+          "artifacts. Run link: "
+          "https://github.com/zhengjunyi23-source/lab1-secure-api/actions/runs/40442950773")
+add_image(doc, os.path.join(PROJ, "screenshots", "ci-job-steps.png"), 15.5,
+          "Figure 1. GitHub Actions job steps — tests, SAST (Bandit) and SCA (Safety) all green")
+add_image(doc, os.path.join(PROJ, "screenshots", "sast-bandit.png"), 15.5,
+          "Figure 2. Bandit (SAST) report — 188 lines of code, 0 issues")
 
 # ================= 6-7 Vulnerable env & reproduction =================
 heading(doc, "6. Selecting and Preparing a Vulnerable Environment", 1)
@@ -279,9 +301,9 @@ para(doc, "These results demonstrate that the attack no longer succeeds while th
 
 # ================= 11 submissions =================
 heading(doc, "11. Submissions (What Students Submit)", 1)
-bullet(doc, "Public git repository with the project code: 【待补：GitHub 仓库链接】")
+bullet(doc, "Public git repository with the project code: https://github.com/zhengjunyi23-source/lab1-secure-api")
 bullet(doc, "README.md in the repository (project & API description, security measures, scanner screenshots, CVE analysis and fix).")
-bullet(doc, "Link to the last successful pipeline run: 【待补：Actions 运行链接】")
+bullet(doc, "Link to the last successful pipeline run: https://github.com/zhengjunyi23-source/lab1-secure-api/actions/runs/40442950773")
 bullet(doc, "Folder with the fixes: cve-2020-1938-fix/ (server.xml, Dockerfile, docker-compose.yml).")
 
 # ================= Control questions =================

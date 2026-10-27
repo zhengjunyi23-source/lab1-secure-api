@@ -103,7 +103,17 @@ Runs automatically on every push to `main` and on every pull request:
    producing `safety-report.json`.
 4. Scanner reports are uploaded as build **artifacts**.
 
-[Screenshots of the pipeline / scanner reports → see the Actions tab link at the bottom.]
+The last successful run on `main` (**#2**, commit `8f9a331`) passed all steps — functional
+tests, **SAST (Bandit)** and **SCA (Safety)** — and uploaded the scanner reports as artifacts:
+
+![CI job steps (SAST + SCA green)](screenshots/ci-job-steps.png)
+
+Bandit (SAST) report — **188 lines of code, 0 issues**:
+
+![Bandit SAST report](screenshots/sast-bandit.png)
+
+Safety (SCA) report — **7 packages scanned, 0 vulnerabilities**
+([`safety-report.json`](ci-evidence/safety-report.json)).
 
 ---
 
@@ -193,5 +203,5 @@ Verification:
 
 ## 5. Useful links
 
-- [Last successful pipeline run → link]
-- [Public repository → link]
+- [Last successful pipeline run](https://github.com/zhengjunyi23-source/lab1-secure-api/actions/runs/40442950773) — run #2, commit `8f9a331`, status **Success**
+- [Public repository](https://github.com/zhengjunyi23-source/lab1-secure-api)
