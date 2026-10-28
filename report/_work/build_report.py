@@ -238,10 +238,10 @@ para(doc, "A GitHub Actions workflow .github/workflows/ci.yml runs on every push
 para(doc, "Local verification of the exact pipeline commands:")
 code_block(doc, "$ bandit -r app\nNo issues identified.\nTotal issues (by severity): Low 0, Medium 0, High 0\n"
                "$ safety check -r requirements.txt\n0 vulnerabilities reported\nNo known security vulnerabilities reported.")
-para(doc, "GitHub Actions run result: the last successful run (#2, commit 8f9a331) on main passed every "
-          "step, including the SAST (Bandit) and SCA (Safety) scans, and uploaded the scanner reports as "
-          "artifacts. Run link: "
-          "https://github.com/zhengjunyi23-source/lab1-secure-api/actions/runs/40442950773")
+para(doc, "GitHub Actions run result: the last successful run (#4, commit 4c674c5) on main passed every "
+          "step **with no warnings**, including the SAST (Bandit) and SCA (Safety) scans, and uploaded the "
+          "scanner reports as artifacts. Run link: "
+          "https://github.com/zhengjunyi23-source/lab1-secure-api/actions/runs/40618883583")
 add_image(doc, os.path.join(PROJ, "screenshots", "ci-job-steps.png"), 15.5,
           "Figure 1. GitHub Actions job steps — tests, SAST (Bandit) and SCA (Safety) all green")
 add_image(doc, os.path.join(PROJ, "screenshots", "sast-bandit.png"), 15.5,
@@ -303,7 +303,7 @@ para(doc, "These results demonstrate that the attack no longer succeeds while th
 heading(doc, "11. Submissions (What Students Submit)", 1)
 bullet(doc, "Public git repository with the project code: https://github.com/zhengjunyi23-source/lab1-secure-api")
 bullet(doc, "README.md in the repository (project & API description, security measures, scanner screenshots, CVE analysis and fix).")
-bullet(doc, "Link to the last successful pipeline run: https://github.com/zhengjunyi23-source/lab1-secure-api/actions/runs/40442950773")
+bullet(doc, "Link to the last successful pipeline run: https://github.com/zhengjunyi23-source/lab1-secure-api/actions/runs/40618883583")
 bullet(doc, "Folder with the fixes: cve-2020-1938-fix/ (server.xml, Dockerfile, docker-compose.yml).")
 
 # ================= Control questions =================
