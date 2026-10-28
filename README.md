@@ -98,7 +98,8 @@ Workflow: `.github/workflows/ci.yml` (GitHub Actions)
 Runs automatically on every push to `main` and on every pull request:
 
 1. **pytest** — functional tests for the API.
-2. **SAST — Bandit** — static analysis of the `app/` source, producing `bandit-report.html`.
+2. **SAST — Bandit** — static analysis of the `app/` source, producing
+   `bandit-report.html` and `bandit-report.json`.
 3. **SCA — Safety** — audits `requirements.txt` for known vulnerable dependencies,
    producing `safety-report.json`.
 4. Scanner reports are uploaded as build **artifacts**.
@@ -108,7 +109,8 @@ functional tests, **SAST (Bandit)** and **SCA (Safety)** — and uploaded the sc
 
 ![CI job steps (SAST + SCA green)](screenshots/ci-job-steps.png)
 
-Bandit (SAST) report — **188 lines of code, 0 issues**:
+Bandit (SAST) report — **188 lines of code, 0 issues**
+([`bandit-report.json`](ci-evidence/bandit-report.json)):
 
 ![Bandit SAST report](screenshots/sast-bandit.png)
 
